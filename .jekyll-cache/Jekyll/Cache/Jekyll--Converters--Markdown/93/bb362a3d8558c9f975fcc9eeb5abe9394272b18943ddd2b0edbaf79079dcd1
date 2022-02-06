@@ -1,0 +1,38 @@
+I"ò<section class="hero is-primary is-small">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <p class="title is-1">
+                voja`s blog
+            </p>
+            <p class="subtitle is-4">
+                <em>embedded way</em>
+            </p>
+        </div>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-half is-offset-one-quarter">
+
+                
+                <div class="box">
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="content">
+                                <a href="/2022/02/06/first-post/">
+                                    <p class="title is-2">blink example! <span class="tag is-white is-pulled-right"><small>February 06, 2022</small></span></p>
+                                    <p class="subtitle"><small>Hey, itâ€™s just my first post whie building this blog!
+</small></p>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+</section>
+:ET

@@ -1,0 +1,16 @@
+# Site settings
+name: Vojislav Milivojevic
+email: milivojevicvoja@gmail.com
+url: url
+description: "voja's blog"
+author: "voja"
+title: "voja`s blog"
+permalink: pretty
+baseurl: 
+
+# social
+github:
+  username: VojislavM
+
+twitter:
+  username: _vojam
