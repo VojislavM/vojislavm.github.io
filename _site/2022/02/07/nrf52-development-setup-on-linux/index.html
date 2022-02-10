@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> nRF52 development setup on Linux |  Vojislav Milivojevic</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="author" content="voja">
+    <meta name="description" content="voja's blog">
+    <link rel="shortcut icon" type="image/png" href="http://via.placeholder.com/128x128">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Crimson+Text">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <nav class="nav">
+    <div class="container">
+        <div class="nav-left">
+            <a class="nav-item" href="/">
+                <span class="icon">
+                    <i class="fa fa-home"></i>
+                </span>
+            </a>
+        </div>
+
+        <div class="nav-center">
+            <a class="nav-item" target="_blank" href="https://www.github.com/VojislavM/">
+                <span class="icon">
+                    <i class="fa fa-github"></i>
+                </span>
+            </a>
+            <a class="nav-item" target="_blank" href="https://www.twitter.com/_vojam/">
+                <span class="icon">
+                    <i class="fa fa-twitter"></i>
+                </span>
+            </a>
+        </div>
+
+        <span class="nav-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+        </span>
+
+        <div class="nav-right nav-menu">
+            
+            <a class="nav-item" href="https://vojam.carrd.co/">
+                <span>About</span>
+            </a>
+            
+        </div>
+
+</nav>
+    <section class="section">
+    <div class="container">
+        <div class="heading has-text-centered">
+            <p class="title is-3">nRF52 development setup on Linux</p>
+            <p class="subtitle is-6"><span class="tag is-white"><small>February 07, 2022</small></span></p>
+        </div>
+        <br>
+        <div class="columns is-multiline">
+
+            <div class="column is-half is-offset-one-quarter">
+                <div class="content">
+                    <p>Setup development environment for nRF5 SDK on Linux host machine</p>
+
+<p>This blog post was originaly posted on <a href="https://www.irnas.eu/nrf52-development-setup-on-linux/">Irnas blog</a> writen by me in 2020.</p>
+
+<p>Designing IoT solutions with low power consumption, various types of connectivity (BLE, LoRa etc.), robust casing, and ensuring satisfactory user experience is a wholesome kind of challenge. When starting a new project it is very important to keep all those ends in mind. A big integrating part of every project here at IRNAS is the embedded software. At IRNAS we like to establish tools and methods for ourselves that make our job easier and less prone to errors right from the start. In this blog, we will demonstrate a simple example of Bluetooth LE beacon and how we go about verifying our design decisions in the process.</p>
+
+<p>Embedded software development for IoT devices is as vividly evolving as the industry itself. Often we see that chip vendors provide SDK (Software Development Kit) for their microcontrollers allowing users to choose the desired toolchain. Moreover, continuous integration tools are starting to enter the field of embedded engineers, as well as new test equipment that provides interfaces in some high-level language like Python. All of these are phenomena we are all familiar with and relate them with software development itself. What all this is showing is that it is now time to treat embedded software more as “regular” software and implement all the good practices and knowledge that already exist. Test-driven development, Continuous Integration, Continuous delivery, automated testing, are just some of those practices.</p>
+
+<p>Let us demonstrate a typical workflow on an nRF52, a chip by Nordic Semi, which we use on a regular basis. We will explain how to set up the environment using the GCC compiler on Linux mashing, beginning with the installation of the toolchain and setting up the development environment for the desired microcontroller.</p>
+
+<p>This setup will be done on the Linux machine (Ubuntu 18.04 LTS) and with the nRF52832-DK development board.</p>
+
+<h2 id="first-install-the-compiler">First, Install the Compiler</h2>
+
+<p>As mentioned earlier for this task we are using a GCC compiler. It is first necessary to install the correct version for ARM devices:</p>
+
+<ol>
+  <li>
+    <p>Download arm-gcc version 7.3.1 (gcc-arm-none-eabi-7-2018-q2-update) from ARM website: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+This can be done from linux terminal with command:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Install the GNU toolchain for ARM: After download, extract it in a folder of your preference <strong>INSTALL_PATH</strong> and then add this path to your <strong>OS PATH</strong> environment variable. Add this line to <code class="language-plaintext highlighter-rouge">.bashrc</code> file in <code class="language-plaintext highlighter-rouge">/home/$USER</code> directory</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ export PATH=$PATH:/gcc-arm-none-eabi-7-2018-q2-update/bin
+</code></pre></div>    </div>
+
+    <p>and then execute:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ source ~/.bashrc
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Verify that the path is set correctly, type the following in your terminal and check the output:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ arm-none-eabi-gcc --version
+ arm-none-eabi-gcc (GNU Tools for ARM Embedded Processors) 5.4.1 20160919 (release) [ARM/embedded-5-branch revision 240496]
+ Copyright (C) 2015 Free Software Foundation, Inc.
+ This is free software; see the source for copying conditions. There is NO
+ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Install make (optional): this need to be done if make is not yet present in the system</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ sudo apt-get install build-essential checkinstall
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="now-clone-the-nordic-nrf5-sdk">Now, Clone the Nordic nRF5 SDK</h2>
+
+<p>It is necessary to clone Nordic Semi nRF5 SDK from their website. There are a lot of release versions of this SDK in which case our suggestion is to use the latest one and stick with it. We will use version v15.3 from the download link and unpack it in the preferred location.</p>
+
+<p>Next, edit the file named <code class="language-plaintext highlighter-rouge">/components/toolchain/gcc/Makefile.posix</code> and change the <code class="language-plaintext highlighter-rouge">GNU_INSTALL_ROOT</code> to point to the location of your GNU Arm Embedded Toolchain installation:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GNU_INSTALL_ROOT ?= /gcc-arm-none-eabi-7-2018-q2-update/bin/
+GNU_VERSION ?= 7.3.1
+GNU_PREFIX ?= arm-none-eabi
+</code></pre></div></div>
+
+<h2 id="next-install-an-ide-or-text-editor-of-choice-if-you-havent-got-one-installed-already">Next, Install an IDE or text editor of choice (if you haven’t got one installed already)</h2>
+
+<p>Everybody has their preferred IDE and text editor, and we are nobody to get in your way regarding which one you use. One we chose to work with is the Visual Studio Code. It is lightweight and configurable so we can change everything we need to get things done fast and efficient with only a handful of commands. Assuming VS Code is your choice the installation can be done with a snap:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo snap install --classic code # or code-insiders
+</code></pre></div></div>
+
+<p>A useful feature of VS Code is the set of available extensions it has to offer. For this example we need two of them:</p>
+
+<ul>
+  <li>CPP TOOLS</li>
+  <li>CORTEX DEBUG</li>
+</ul>
+
+<p>Lastly, one optional thing to install is Java run time environment. This is used to get a graphical interface with checkboxes for CMSIS configuration:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo apt-get install default-jre
+</code></pre></div></div>
+
+<h2 id="add-environmental-variables-to-system">Add environmental variables to system</h2>
+
+<p>Setting the environmental variables in your Linux system can be done in several ways. One way is to open <code class="language-plaintext highlighter-rouge">.bashrc</code> filed in your favourite text editor and at the end of the file just add:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># nRF SDK location
+export nRF_SDK=/nRF5_SDK_15.3.0_59ac345
+# ARM GCC location
+export GNU_GCC=/gcc-arm-none-eabi-7-2018-q2-update 
+</code></pre></div></div>
+
+<p>where <code class="language-plaintext highlighter-rouge">&lt;INSTALL_PATH&gt;</code> needs to be the path to your nRF5 SDK and GCC-ARM. After that save the file and restart the terminal.</p>
+
+<h2 id="setup-the-workplace">Setup the workplace</h2>
+
+<p>We will use ble_app_beacon example, one of many in Nordic Semi nRF5 SDK to demonstrate the build debug and power measurement procedures. So after opening the VS Code, we should add the folder to the workplace. So go to: <code class="language-plaintext highlighter-rouge">File -&gt; Add Folder to Workplace...</code> and add example application from SDK: <code class="language-plaintext highlighter-rouge">nRF5_SDK_15.3.0_59ac345/examples/ble_peripheral/ble_app_beacon</code>. Save the workplace file with: <code class="language-plaintext highlighter-rouge">File -&gt; Save Workplace As...</code></p>
+
+<h2 id="c-edit-configuration">C edit configuration</h2>
+
+<p>To be able to see the C/CPP properties file in folder structure press <code class="language-plaintext highlighter-rouge">Ctrl + Shift + P</code> and search for <strong>C/C++: Edit Configuration (JSON)</strong>. After that, a new file will appear in the folder structure <code class="language-plaintext highlighter-rouge">./.vscode/c_cpp_properites.json</code>. Here we will change all the compile flags and other necessary paths. The file should look like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+    "configurations": [
+        {
+            "name": "nRF52832 DK",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env:GNU_GCC}/arm-none-eabi/include",
+                "${env:nRF_SDK}/modules/**",
+                "${env:nRF_SDK}/components/**"
+            ],
+            "defines": [
+                "BOARD_PCA10040",
+                "CONFIG_GPIO_AS_PINRESET",
+                "INITIALIZE_USER_SECTIONS",
+                "FLOAT_ABI_HARD",
+                "NRF52",
+                "NRF52832_XXAA",
+                "NRF_SD_BLE_API_VERSION=6",
+                "S132",
+                "SOFTDEVICE_PRESENT",
+                "SWI_DISABLE0"
+            ],
+            "compilerPath": "${env:GNU_GCC}/bin/arm-none-eabi-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
+</code></pre></div></div>
+
+<h2 id="task-setup">Task setup</h2>
+
+<p>Now it is time to add all necessary tasks to the VS Code to know how to build, clean or flash the project. To create tasks file go to <code class="language-plaintext highlighter-rouge">Terminal -&gt; Configure Tasks...</code> then select Create <code class="language-plaintext highlighter-rouge">tasks.json</code> file from template and select Other. A <code class="language-plaintext highlighter-rouge">tasks.json</code> file will be created and it needs to be configured with the following tasks:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">build</code> – build the project</li>
+  <li><code class="language-plaintext highlighter-rouge">clean</code> – clean the project, delete the build folder</li>
+  <li><code class="language-plaintext highlighter-rouge">flash</code> – flash the application code</li>
+  <li><code class="language-plaintext highlighter-rouge">flash_softdevice</code> – flash the softdevice, need to be done before flashing the application firmware</li>
+  <li><code class="language-plaintext highlighter-rouge">sdk_config</code> – configure CMSIS for the application</li>
+  <li><code class="language-plaintext highlighter-rouge">serial</code> – open the serial port to the device</li>
+  <li><code class="language-plaintext highlighter-rouge">erase</code> – erase the application from the target</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make",
+            "options": {
+                "cwd": "${workspaceFolder}/pca10040/s132/armgcc"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "make clean",
+            "options": {
+                "cwd": "${workspaceFolder}/pca10040/s132/armgcc"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "flash",
+            "type": "shell",
+            "command": "make flash",
+            "options": {
+                "cwd": "${workspaceFolder}/pca10040/s132/armgcc"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "flash_softdevice",
+            "type": "shell",
+            "command": "make flash_softdevice",
+            "options": {
+                "cwd": "${workspaceFolder}/pca10040/s132/armgcc"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "sdk_config",
+            "type": "shell",
+            "command": "make sdk_config",
+            "options": {
+                "cwd": "${workspaceFolder}/pca10040/s132/armgcc"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "serial",
+            "type": "shell",
+            "command": "screen /dev/ttyACM0 115200",
+            "problemMatcher": []
+        },
+        {
+            "label": "erase",
+            "type": "shell",
+            "command": "make erase",
+            "options": {
+                "cwd": "${workspaceFolder}/pca10056/s140/armgcc"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
+</code></pre></div></div>
+
+<h2 id="finally-configure-debug">Finally, Configure debug</h2>
+
+<p>Target debug is a feature that most of the professional IDEs have, and it is absolutely crucial when developing advanced firmware applications. With Cortex-debug extension this is also possible in VS code. First, we just need to create debug configuration <code class="language-plaintext highlighter-rouge">launch.json</code> and configure the file:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceFolder}/pca10040/s132/armgcc/_build/nrf52832_xxaa.out",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "device": "nrf52",
+            "interface": "swd",
+            "ipAddress": null,
+            "serialNumber": null,
+            "armToolchainPath": "${env:GNU_GCC}/bin/"
+        }
+    ]
+}
+</code></pre></div></div>
+
+<p>To start debugging go to <code class="language-plaintext highlighter-rouge">Run -&gt; Start Debugging</code> and the debugging session will start.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>After this setup, we can build debug and flash our application to the target device using nRF52832 and see it in action. While we only scratched the surface of what VS Code is capable of, hopefully, this post at least helped you get it all up and running. In the coming posts, we will focus on adding additional tools to the build process and also show you how we develop firmware applications with other exciting test tools.</p>
+
+<p>For more insight, have a scroll through the following links:</p>
+<ul>
+  <li>https://www.novelbits.io/nrf52-visual-studio-code/</li>
+  <li>https://gustavovelascoh.wordpress.com/2017/01/23/starting-development-with-nordic-nrf5x-and-gcc-on-linux/</li>
+  <li>https://electronut.in/visual-studio-code-nrf52-dev/</li>
+</ul>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+    <footer class="page-footer">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-4">
+                <div class="content">
+                    <p>
+                        <small>
+                            <span>Powered by</span>
+                            <a target="_blank" href="https://github.com/VojislavM/vojislavm.github.io">github</a>
+                            <span> with </span>
+                            <a>&#128151;</a>
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="/js/script.js"></script>
+</body>
+
+</html>
