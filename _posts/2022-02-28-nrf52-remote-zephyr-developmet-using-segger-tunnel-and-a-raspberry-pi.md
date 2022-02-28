@@ -38,7 +38,7 @@ In December of 2020 there was great news from Segger that the complete J-Link so
 
 For the purposes of this demo, we will be using the Nordic Semiconductor nRF9160DK development kit since it already contains both a J-Link and the target MCU hardware. The board connects via USB to the Raspberry Pi which connects to power and Ethernet (WiFi is also an option).
 
-![server setup][{{site.url}}/assets/zephyr-remote-development_hardware-setup_2-1030x677.jpg]
+![image server_setup here]({{site.url}}/assets/zephyr-remote-development_hardware-setup_2-1030x677.jpg)
 
 Now J-Link software needs to be installed on Raspberry Pi so it can work as a remote J-Link Server. In the Raspberry Pi user home directory, download and un-tar the [Segger utilities][utilities-link] for the Raspberry Pi (choose the Linux ARM 32-bit TGZ archive). Then configure the udev rules as per the README.txt file in the JLink_Linux_Vxxx_arm directory.
 
