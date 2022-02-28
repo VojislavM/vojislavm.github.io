@@ -107,18 +107,18 @@ minicom -D /dev/ttyACM1 -b 115200
 
 While Segger provides very interesting tools for embedded developers, there is still some work that needs to be done so they are properly integrated into our development workflow. Remote flashing is just one part of all capabilities, so this can be a starting point for a great remote development setup!
 
-* [github-link]: https://github.com/VojislavM/remote-jlink-programming
-* [jon-beri-link]: https://www.linkedin.com/in/jonathanberi/
-* [golioth-blog-link]: https://blog.golioth.io/remote-zephyr-development-using-segger-tunnel-and-a-raspberry-pi/
-* [irnas-link]: https://www.irnas.eu/
-* [equipment-link]: https://www.mikroe.com/planet-debug
-* [segger-link]: https://www.segger.com/
-* [jlink-link]: https://www.segger.com/products/debug-probes/j-link/
-* [zephyr-link]: https://www.zephyrproject.org/
-* [west-link]: https://docs.zephyrproject.org/latest/guides/west/index.html
-* [picture-link]: /picture/link
-* [utilities-link]: https://www.segger.com/downloads/jlink
-* [ncs-link]: https://www.nordicsemi.com/Products/Development-software/nRF-Connect-SDK
+[github-link]: https://github.com/VojislavM/remote-jlink-programming
+[jon-beri-link]: https://www.linkedin.com/in/jonathanberi/
+[golioth-blog-link]: https://blog.golioth.io/remote-zephyr-development-using-segger-tunnel-and-a-raspberry-pi/
+[irnas-link]: https://www.irnas.eu/
+[equipment-link]: https://www.mikroe.com/planet-debug
+[segger-link]: https://www.segger.com/
+[jlink-link]: https://www.segger.com/products/debug-probes/j-link/
+[zephyr-link]: https://www.zephyrproject.org/
+[west-link]: https://docs.zephyrproject.org/latest/guides/west/index.html
+[picture-link]: images/zephyr-remote-development_hardware-setup_2-1030x677.jpg
+[utilities-link]: https://www.segger.com/downloads/jlink
+[ncs-link]: https://www.nordicsemi.com/Products/Development-software/nRF-Connect-SDK
 
 
 
